@@ -3,15 +3,15 @@ package com.example.uaenew;
 import com.google.gson.annotations.SerializedName;
 
 public class UAEData {
-
-    @SerializedName("title")
-    private String title;
     @SerializedName("author")
     private String author;
-    @SerializedName("urlToImage")
-    private String urlToImage;
+    @SerializedName("title")
+    private String title;
     @SerializedName("description")
     private String description;
+    @SerializedName("urlToImage")
+    private String urlToImage;
+
 
     public String getTitle() {
         return title;

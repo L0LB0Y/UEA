@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.Myholder> {
-    List<UAEData> list;
+    List<Article> list;
     Context context;
 
-    public Adapter(List<UAEData> list, Context context) {
+    public Adapter(List<Article> list, Context context) {
         this.list = list;
         this.context = context;
     }
@@ -54,7 +54,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.Myholder> {
             title = (TextView)itemView.findViewById(R.id.title_);
         }
 
-        public void setData(UAEData restData, Context context) {
+        public void setData(Article restData, Context context) {
             Picasso.get().load(restData.getUrlToImage()).into(image);
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -77,7 +77,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.Myholder> {
                 }
             });
         }
-        public void nextActivity(UAEData restData, Context context){
+        public void nextActivity(Article restData, Context context){
             Intent intent = new Intent(context, DisplayData.class);
             intent.putExtra("imgUrl",restData.getUrlToImage());
             intent.putExtra("author",restData.getAuthor());

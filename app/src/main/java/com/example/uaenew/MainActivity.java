@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -26,44 +28,52 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
+    Retrofit retrofit;
     Adapter adapter;
     ProgressDialog progress;
     RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progress = new ProgressDialog(this);
-        progress.setMessage("Loading.....!");
-        progress.show();
-        recyclerView = (RecyclerView)findViewById(R.id.recycler);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler);
         recyclerView.setItemViewCacheSize(50);
-
-        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-        Call<List<UAEData>> call = service.getAllData();
-        call.enqueue(new Callback<List<UAEData>>() {
-            @Override
-            public void onResponse(Call<List<UAEData>> call, Response<List<UAEData>> response) {
-                progress.dismiss();
-                Toast.makeText(MainActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
-               // generateDataList(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<List<UAEData>> call, Throwable t) {
-                progress.dismiss();
-                Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        configRetrofitRequest();
 
     }
 
-    private void generateDataList(List<UAEData> body) {
+    public void configRetrofitRequest() {
+        String country = "ae";
+        String apiKey = "71f81d9d7d054d34836780e266e2e2d9";
+        retrofit = new retrofit2.Retrofit.Builder()
+                .baseUrl("https://newsapi.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        GetDataService service = retrofit.create(GetDataService.class);
+        Call<Example> call = service.getAllData(country, apiKey);
+        call.enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Call<Example> call, Response<Example> response) {
+                generateDataList(response.body().getArticles());
+            }
 
-        adapter = new Adapter(body,this);
+            @Override
+            public void onFailure(Call<Example> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"No Internet Connection", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void generateDataList(List<Article> body) {
+
+        adapter = new Adapter(body, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
